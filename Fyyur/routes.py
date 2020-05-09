@@ -87,7 +87,7 @@ def search_venues():
   }
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
-# Todo: Find venue by id
+#! Find venue by id
 #  ----------------------------------------------------------------
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
@@ -214,7 +214,6 @@ def edit_venue(venue_id):
       form.seeking_description.data=venue.seeking_description
       return render_template('forms/edit_venue.html', form=form, venue=venue)
 
-
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
   form = VenueForm()
@@ -266,11 +265,10 @@ def search_artists():
   }
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
-#Todo Find artist by id
+#! Find artist by id
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
+
   data1={}
   artist = Artist.query.get(artist_id)
   shows_id = Show.query.filter_by(Artist_id=artist_id).all()
@@ -343,8 +341,6 @@ def edit_artist(artist_id):
       
         return render_template('forms/edit_artist.html',form=form, artist=artist)
   
-
-
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
     form = ArtistForm()

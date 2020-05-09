@@ -244,6 +244,3 @@ class ArtistForm(Form):
     phone = StringField(
         'phone', validators=[DataRequired(), Regexp("^[0-9]*$", message="You enterd wrong format.")]
     )
-
-# TODO IMPLEMENT NEW ARTIST FORM 
-# TODO IMPLEMENT NEW SHOW FORM
