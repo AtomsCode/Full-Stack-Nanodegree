@@ -104,8 +104,7 @@ def create_app(test_config=None):
     # '''
 
     # '''
-    # @TODO:
-    #! Create a POST endpoint to get questions based on a search term.
+    # TODO:  Create a POST endpoint to get questions based on a search term.
     # It should return any questions for whom the search term
     # is a substring of the question.
 
@@ -115,8 +114,19 @@ def create_app(test_config=None):
     # '''
 
     # '''
-    # TODO:  Create a GET endpoint to get questions based on category.
+    # * get questions filtered by category ID.
     # '''
+    @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+    def questions_by_categoryID(category_id):
+
+        query =  Question.query.filter(Question.category == category_id)
+        
+        questions = [question.format() for question in query]
+                        
+        return jsonify({
+            'questions': questions,
+            'total_questions': len(questions),
+        })
 
     #! TEST: In the "List" tab / main screen, clicking on one of the
     # categories in the left column will cause only questions of that
@@ -134,6 +144,8 @@ def create_app(test_config=None):
     # one question at a time is displayed, the user is allowed to answer
     # and shown whether they were correct or not.
     # '''
+
+
 
     # '''
     #! @TODO:
