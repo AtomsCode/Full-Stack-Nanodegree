@@ -15,12 +15,13 @@ def create_app(test_config=None):
     setup_db(app)
 
     # '''
-    # TODO: Set up CORS. Allow '*'
+    # * Set up CORS. Allow '*'
+    # enable cross-domain requests and set response headers
     # '''
     CORS(app, resources={'/': {'origins': '*'}})
 
     # '''
-    # TODO: Use  after request decorator to set Access-Control-Allow
+    # * Use after request decorator to set Access-Control-Allow
     # '''
     @app.after_request
     def after_request(response):
@@ -36,6 +37,7 @@ def create_app(test_config=None):
 #----------------------------------------------------------------------------#
 # '''
 # * GET requests for all available categories.
+#
 # '''
     @app.route('/categories', methods=['GET'])
     def all_categories():
@@ -50,7 +52,7 @@ def create_app(test_config=None):
         })
 
     # '''
-    #! TODO: Create an endpoint to handle GET requests for questions,
+    # TODO: Create an endpoint to handle GET requests for questions,
     # including pagination (every 10 questions).
     # This endpoint should return a list of questions,
     # number of total questions, current category, categories.
@@ -71,13 +73,13 @@ def create_app(test_config=None):
         question = Question.query.get(id)
         question.delete()
 
-        #  TODO I did test this by curl -i -X DELETE http://127.0.0.1:5000/questions/24 
-        #  it deleted but because no return it show error
-
+    #  TODO I did test this by curl -i -X DELETE http://127.0.0.1:5000/questions/24 
+    #  it deleted but because no return it show error
    # '''
-    #! TEST: When you click the trash icon next to a question, the question will be removed.
-    # This removal will persist in the database and when you refresh the page.
+     #! TEST: When you click the trash icon next to a question, the question will be removed.
+     # This removal will persist in the database and when you refresh the page.
     # '''
+
 
     # '''
     # * POST a new question, require the question and answer text, category, and difficulty score.
@@ -95,12 +97,11 @@ def create_app(test_config=None):
             'question': new_question.format()
         })
         # TODO" I Test Entering Data by curl -i -X POST -H 'Content-Type: application/json' -d '{"question": "NO WAY!", "answer": "HHA", "category":2 , "difficulty":1 }' http://127.0.0.1:5000/questions
-        
-
     #! TEST: When you submit a question on the "Add" tab,
     # the form will clear and the question will appear at the end of the last page
     # of the questions list in the "List" tab.
     # '''
+
 
     # '''
     #* POST to get questions based on a search term.
@@ -119,16 +120,14 @@ def create_app(test_config=None):
             'questions': [question.format() for question in questions],
         }), 200
 
-                
-
-     
     #! TEST: Search by any phrase. The questions list will update to include
     # only question that include that string within their question.
     # Try using the word "title" to start.
     # '''
 
+
     # '''
-    # * get questions filtered by category ID.
+    # * get questions filtered by (category type) category ID.
     # '''
     @app.route('/categories/<int:category_id>/questions', methods=['GET'])
     def questions_by_categoryID(category_id):
@@ -147,6 +146,7 @@ def create_app(test_config=None):
     # category to be shown.
     # '''
 
+
     # '''
     #! TODO: Create a POST to get questions to play the quiz.
     # This should take category and previous question parameters
@@ -162,7 +162,7 @@ def create_app(test_config=None):
 
     # '''
     #? TODO: Check all Routes and Create error handlers for all expected errors
-    # including 404 and 422.
+    # including 400, 404, 422 and 500. 
     # '''
 
     return app
