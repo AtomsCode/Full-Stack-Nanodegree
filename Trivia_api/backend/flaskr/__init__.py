@@ -50,8 +50,7 @@ def create_app(test_config=None):
         })
 
     # '''
-    # @TODO:
-    #! Create an endpoint to handle GET requests for questions,
+    #! TODO: Create an endpoint to handle GET requests for questions,
     # including pagination (every 10 questions).
     # This endpoint should return a list of questions,
     # number of total questions, current category, categories.
@@ -104,10 +103,25 @@ def create_app(test_config=None):
     # '''
 
     # '''
-    # TODO:  Create a POST endpoint to get questions based on a search term.
-    # It should return any questions for whom the search term
-    # is a substring of the question.
+    #* POST to get questions based on a search term.
+    # It should return any questions based on the search term
+    # Substring of the question are allowed.
+    @app.route('/questions/search', methods=['POST'])
+    def search_questions():
+        data = request.get_json()
+        search_term = data.get('searchTerm', '')
 
+        questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+
+        # return response if successful
+        return jsonify({
+            'success': True,
+            'questions': [question.format() for question in questions],
+        }), 200
+
+                
+
+     
     #! TEST: Search by any phrase. The questions list will update to include
     # only question that include that string within their question.
     # Try using the word "title" to start.
@@ -120,7 +134,7 @@ def create_app(test_config=None):
     def questions_by_categoryID(category_id):
 
         query =  Question.query.filter(Question.category == category_id)
-        
+  
         questions = [question.format() for question in query]
                         
         return jsonify({
@@ -134,9 +148,8 @@ def create_app(test_config=None):
     # '''
 
     # '''
-    #! @TODO:
-    # Create a POST endpoint to get questions to play the quiz.
-    # This endpoint should take category and previous question parameters
+    #! TODO: Create a POST to get questions to play the quiz.
+    # This should take category and previous question parameters
     # and return a random questions within the given category,
     # if provided, and that is not one of the previous questions.
 
@@ -148,8 +161,7 @@ def create_app(test_config=None):
 
 
     # '''
-    #! @TODO:
-    # Create error handlers for all expected errors
+    #? TODO: Check all Routes and Create error handlers for all expected errors
     # including 404 and 422.
     # '''
 
