@@ -41,22 +41,41 @@ def create_app(test_config=None):
 # '''
     @app.route('/categories', methods=['GET'])
     def all_categories():
-        result = {}
         categories = Category.query.all()
 
-        for category in categories:
-            result[category.id] = category.type
-
         return jsonify({
-            'categories': result
+            'categories': [Category.format()['type'] for Category in categories],
         })
 
     # '''
-    # TODO: Create an endpoint to handle GET requests for questions,
+    # TODO: Create GET requests for questions,
     # including pagination (every 10 questions).
     # This endpoint should return a list of questions,
     # number of total questions, current category, categories.
     # '''
+    @app.route('/questions')
+    def get_questions():
+        Questions = Question.query.order_by(Question.id).all()
+        Categories = Category.query.order_by(Category.type).all()
+    
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
+
+        questions = [question.format() for question in Questions]
+        current_questions = questions[start:end]
+
+        if len(current_questions) == 0:
+            abort(404)
+
+        return jsonify({
+            'success': True,
+            'questions': current_questions,
+            'total_questions': len(Questions),
+            'categories': {category.id: category.type for category in Categories},
+            'current_category': None
+        })
+    #  use http://127.0.0.1:5000/questions?page=(PageNumberHere)
 
     # '''
     #! TEST: At this point, when you start the application
@@ -70,11 +89,19 @@ def create_app(test_config=None):
     # '''
     @app.route('/questions/<int:id>', methods=['DELETE'])
     def delete_question(id):
-        question = Question.query.get(id)
-        question.delete()
+        try:
+            question = Question.query.get(id)
+            question.delete()
 
-    #  TODO I did test this by curl -i -X DELETE http://127.0.0.1:5000/questions/24 
-    #  it deleted but because no return it show error
+            return jsonify({
+                'success': True,
+                'DELETED ID': id,
+            })
+            
+        except:
+            abort(422)
+
+    #  tested this by curl -i -X DELETE http://127.0.0.1:5000/questions/25  & also by postman
    # '''
      #! TEST: When you click the trash icon next to a question, the question will be removed.
      # This removal will persist in the database and when you refresh the page.
@@ -90,13 +117,17 @@ def create_app(test_config=None):
         answer = request.json.get('answer')
         category = request.json.get('category')
         difficulty = request.json.get('difficulty')
-       
+
+        # Check if fields are empity or not
+        if not (question and answer and category and difficulty):
+            return abort(400)
+                        
         new_question = Question(question, answer, category, difficulty)
         new_question.insert()
         return jsonify({
             'question': new_question.format()
         })
-        # TODO" I Test Entering Data by curl -i -X POST -H 'Content-Type: application/json' -d '{"question": "NO WAY!", "answer": "HHA", "category":2 , "difficulty":1 }' http://127.0.0.1:5000/questions
+    # I Test Entering Data by curl -i -X POST -H 'Content-Type: application/json' -d '{"question": "NO WAY!", "answer": "HHA", "category":2 , "difficulty":1 }' http://127.0.0.1:5000/questions
     #! TEST: When you submit a question on the "Add" tab,
     # the form will clear and the question will appear at the end of the last page
     # of the questions list in the "List" tab.
@@ -104,6 +135,7 @@ def create_app(test_config=None):
 
 
     # '''
+    # Todo come check this one again 
     #* POST to get questions based on a search term.
     # It should return any questions based on the search term
     # Substring of the question are allowed.
@@ -131,15 +163,18 @@ def create_app(test_config=None):
     # '''
     @app.route('/categories/<int:category_id>/questions', methods=['GET'])
     def questions_by_categoryID(category_id):
+        try:
+            query =  Question.query.filter(Question.category == category_id)
+            questions = [question.format() for question in query]
+                            
+            return jsonify({
+                'success': True,
+                'questions': questions,
+                'total_questions': len(questions),
+            })
 
-        query =  Question.query.filter(Question.category == category_id)
-  
-        questions = [question.format() for question in query]
-                        
-        return jsonify({
-            'questions': questions,
-            'total_questions': len(questions),
-        })
+        except:
+            abort(404)
 
     #! TEST: In the "List" tab / main screen, clicking on one of the
     # categories in the left column will cause only questions of that
@@ -148,10 +183,11 @@ def create_app(test_config=None):
 
 
     # '''
-    #! TODO: Create a POST to get questions to play the quiz.
+    # TODO: Create a POST to get questions to play the quiz.
     # This should take category and previous question parameters
     # and return a random questions within the given category,
     # if provided, and that is not one of the previous questions.
+    
 
     #! TEST: In the "Play" tab, after a user selects "All" or a category,
     # one question at a time is displayed, the user is allowed to answer
