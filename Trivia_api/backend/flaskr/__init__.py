@@ -32,9 +32,9 @@ def create_app(test_config=None):
         return response
 
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Routes.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # '''
 # * GET requests for all available categories.
 #
@@ -44,7 +44,8 @@ def create_app(test_config=None):
         categories = Category.query.all()
 
         return jsonify({
-            'categories': [Category.format()['type'] for Category in categories],
+            'categories': [
+                Category.format()['type'] for Category in categories],
         })
 
     # '''
@@ -57,7 +58,7 @@ def create_app(test_config=None):
     def get_questions():
         Questions = Question.query.order_by(Question.id).all()
         Categories = Category.query.order_by(Category.type).all()
-    
+
         page = request.args.get('page', 1, type=int)
         start = (page - 1) * QUESTIONS_PER_PAGE
         end = start + QUESTIONS_PER_PAGE
@@ -72,15 +73,17 @@ def create_app(test_config=None):
             'success': True,
             'questions': current_questions,
             'total_questions': len(Questions),
-            'categories': {category.id: category.type for category in Categories},
+            'categories': {
+                category.id: category.type for category in Categories},
             'current_category': None
         })
     #  use http://127.0.0.1:5000/questions?page=(PageNumberHere)
 
     # '''
-    #! TEST: At this point, when you start the application
+    # ! TEST: At this point, when you start the application
     # you should see questions and categories generated,
-    # ten questions per page and pagination at the bottom of the screen for three pages.
+    # ten questions per page
+    # and pagination at the bottom of the screen for three pages.
     # Clicking on the page numbers should update the questions.
     # '''
 
@@ -97,19 +100,17 @@ def create_app(test_config=None):
                 'success': True,
                 'DELETED ID': id,
             })
-            
+
         except:
             abort(422)
 
-    #  tested this by curl -i -X DELETE http://127.0.0.1:5000/questions/25  & also by postman
-   # '''
-     #! TEST: When you click the trash icon next to a question, the question will be removed.
-     # This removal will persist in the database and when you refresh the page.
-    # '''
-
+    # ! TEST: When you click the trash icon
+    # next to a question, the question will be removed.
+    # This removal will persist in the database and when you refresh the page.
 
     # '''
-    # * POST a new question, require the question and answer text, category, and difficulty score.
+    # * POST a new question,
+    # require the question and answer text, category, and difficulty score.
     # '''
     @app.route('/questions', methods=['POST'])
     def add_question():
@@ -121,18 +122,17 @@ def create_app(test_config=None):
         # Check if fields are empity or not
         if not (question and answer and category and difficulty):
             return abort(400)
-                        
+
         new_question = Question(question, answer, category, difficulty)
         new_question.insert()
         return jsonify({
             'question': new_question.format()
         })
-    # I Test Entering Data by curl -i -X POST -H 'Content-Type: application/json' -d '{"question": "NO WAY!", "answer": "HHA", "category":2 , "difficulty":1 }' http://127.0.0.1:5000/questions
-    #! TEST: When you submit a question on the "Add" tab,
-    # the form will clear and the question will appear at the end of the last page
+    # ! TEST: When you submit a question on the "Add" tab,
+    # the form will clear and the question
+    # will appear at the end of the last page
     # of the questions list in the "List" tab.
     # '''
-
 
     # '''
     # * POST to get questions based on a search term.
@@ -142,11 +142,12 @@ def create_app(test_config=None):
     def search_questions():
         data = request.get_json()
         search_term = data.get('searchTerm', '')
-        
+
         if search_term == '':
             abort(422)
 
-        questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+        questions = Question.query.filter(
+            Question.question.ilike(f'%{search_term}%')).all()
 
         # return response if successful
         return jsonify({
@@ -154,11 +155,10 @@ def create_app(test_config=None):
             'questions': [question.format() for question in questions],
         }), 200
 
-    #! TEST: Search by any phrase. The questions list will update to include
+    # ! TEST: Search by any phrase. The questions list will update to include
     # only question that include that string within their question.
     # Try using the word "title" to start.
     # '''
-
 
     # '''
     # * get questions filtered by (category type) category ID.
@@ -166,9 +166,9 @@ def create_app(test_config=None):
     @app.route('/categories/<int:category_id>/questions', methods=['GET'])
     def questions_by_categoryID(category_id):
         try:
-            query =  Question.query.filter(Question.category == category_id)
+            query = Question.query.filter(Question.category == category_id)
             questions = [question.format() for question in query]
-                            
+
             return jsonify({
                 'success': True,
                 'questions': questions,
@@ -178,11 +178,10 @@ def create_app(test_config=None):
         except:
             abort(404)
 
-    #! TEST: In the "List" tab / main screen, clicking on one of the
+    # ! TEST: In the "List" tab / main screen, clicking on one of the
     # categories in the left column will cause only questions of that
     # category to be shown.
     # '''
-
 
     # '''
     # * Create a POST to get questions to play quiz.
@@ -191,7 +190,7 @@ def create_app(test_config=None):
     # and not one of the previous questions.
     @app.route('/quizzes', methods=['POST'])
     def quiz_question():
-  
+
         data = request.get_json()
         previous_questions = data.get('previous_questions')
         quiz_category = data.get('quiz_category')
@@ -200,13 +199,14 @@ def create_app(test_config=None):
         if ((quiz_category is None) or (previous_questions is None)):
             abort(400)
 
-        # Check if category is not specified which return all questions else specific category only
-        if ( quiz_category == 0 ):
+        # Check if category is not specified
+        # it should return all questions else specific category only
+        if (quiz_category == 0):
             questions = Question.query.all()
         else:
-            questions = Question.query.filter_by( category = quiz_category ).all()
-                
-        # Function to generator random question  
+            questions = Question.query.filter_by(category=quiz_category).all()
+
+        # Function to generator random question
         def get_random_question():
             return questions[random.randint(0, len(questions)-1)]
 
@@ -215,38 +215,37 @@ def create_app(test_config=None):
 
         # check if next question not on previous questions
         found = True
-
-        # loop if found is true until found new question 
+        # loop if found is true until found new question
         while found:
             if next_question.id in previous_questions:
                 next_question = get_random_question()
             else:
                 found = False
 
-        #retun the question
+        # retun the question
         return jsonify({
             'success': True,
             'question': next_question.format(),
         }), 200
 
-
-    #! TEST: In the "Play" tab, after a user selects "All" or a category,
+    # ! TEST: In the "Play" tab, after a user selects "All" or a category,
     # one question at a time is displayed, the user is allowed to answer
     # and shown whether they were correct or not.
     # '''
 
-
-
     # '''
     # * Check all Routes and Create error handlers for all expected errors
-    # including 400, 404, 422 and 500 errors handlers. 
+    # including 400, 404, 422 and 500 errors handlers.
     # '''
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
             "success": False,
             "error": 404,
-            "message": "resource not found. The requested page could not be found but may be available again in the future"
+            "message": "resource not found." +
+            "The requested page" +
+            "could not be found" +
+            "but may be available again in the future"
         }), 404
 
     @app.errorhandler(422)
@@ -254,7 +253,10 @@ def create_app(test_config=None):
         return jsonify({
             "success": False,
             "error": 422,
-            "message": "unprocessable, unable to process the contained instructions. Error realted to semantically erroneous"
+            "message": "unprocessable," +
+            "unable to process" +
+            "the contained instructions." +
+            "Error realted to semantically erroneous"
         }), 422
 
     @app.errorhandler(400)
