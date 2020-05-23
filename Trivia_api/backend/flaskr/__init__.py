@@ -183,11 +183,50 @@ def create_app(test_config=None):
 
 
     # '''
-    # TODO: Create a POST to get questions to play the quiz.
+    # * Create a POST to get questions to play quiz.
     # This should take category and previous question parameters
     # and return a random questions within the given category,
-    # if provided, and that is not one of the previous questions.
-    
+    # and not one of the previous questions.
+    @app.route('/quizzes', methods=['POST'])
+    def quiz_question():
+  
+        data = request.get_json()
+        previous_questions = data.get('previous_questions')
+        quiz_category = data.get('quiz_category')
+
+        # Check if quiz category and previous questions not empity
+        if ((quiz_category is None) or (previous_questions is None)):
+            abort(400)
+
+        # Check if category is not specified which return all questions else specific category only
+        if ( quiz_category == 0 ):
+            questions = Question.query.all()
+        else:
+            questions = Question.query.filter_by( category = quiz_category ).all()
+                
+        # Function to generator random question  
+        def get_random_question():
+            return questions[random.randint(0, len(questions)-1)]
+
+        # get next question
+        next_question = get_random_question()
+
+        # check if next question not on previous questions
+        found = True
+
+        # loop if found is true until found new question 
+        while found:
+            if next_question.id in previous_questions:
+                next_question = get_random_question()
+            else:
+                found = False
+
+        #retun the question
+        return jsonify({
+            'success': True,
+            'question': next_question.format(),
+        }), 200
+
 
     #! TEST: In the "Play" tab, after a user selects "All" or a category,
     # one question at a time is displayed, the user is allowed to answer
