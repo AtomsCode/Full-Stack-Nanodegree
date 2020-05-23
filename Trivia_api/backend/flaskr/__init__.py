@@ -33,7 +33,7 @@ def create_app(test_config=None):
 
 
 #----------------------------------------------------------------------------#
-# categories Routes.
+# Routes.
 #----------------------------------------------------------------------------#
 # '''
 # * GET requests for all available categories.
@@ -48,7 +48,7 @@ def create_app(test_config=None):
         })
 
     # '''
-    # TODO: Create GET requests for questions,
+    # * GET requests for questions,
     # including pagination (every 10 questions).
     # This endpoint should return a list of questions,
     # number of total questions, current category, categories.
@@ -135,9 +135,8 @@ def create_app(test_config=None):
 
 
     # '''
-    # Todo come check this one again 
-    #* POST to get questions based on a search term.
-    # It should return any questions based on the search term
+    # * POST to get questions based on a search term.
+    # return questions based on the search term
     # Substring of the question are allowed.
     @app.route('/questions/search', methods=['POST'])
     def search_questions():
