@@ -236,8 +236,39 @@ def create_app(test_config=None):
 
 
     # '''
-    #? TODO: Check all Routes and Create error handlers for all expected errors
-    # including 400, 404, 422 and 500. 
+    # * Check all Routes and Create error handlers for all expected errors
+    # including 400, 404, 422 and 500 errors handlers. 
     # '''
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "resource not found. The requested page could not be found but may be available again in the future"
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "unprocessable, unable to process the contained instructions. Error realted to semantically erroneous"
+        }), 422
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 400,
+            "message": "The request cannot be fulfilled due to bad syntax"
+        }), 400
+
+    @app.errorhandler(500)
+    def bad_request(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "Internal Server Error."
+        }), 500
 
     return app
