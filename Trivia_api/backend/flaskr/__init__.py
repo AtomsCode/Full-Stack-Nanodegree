@@ -143,6 +143,9 @@ def create_app(test_config=None):
     def search_questions():
         data = request.get_json()
         search_term = data.get('searchTerm', '')
+        
+        if search_term == '':
+            abort(422)
 
         questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
 
