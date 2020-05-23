@@ -256,7 +256,7 @@ def create_app(test_config=None):
         }), 422
 
     @app.errorhandler(400)
-    def bad_request(error):
+    def bad_syntax(error):
         return jsonify({
             "success": False,
             "error": 400,
@@ -264,7 +264,7 @@ def create_app(test_config=None):
         }), 400
 
     @app.errorhandler(500)
-    def bad_request(error):
+    def Server_Error(error):
         return jsonify({
             "success": False,
             "error": 500,
