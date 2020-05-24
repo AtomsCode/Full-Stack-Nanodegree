@@ -46,6 +46,7 @@ def create_app(test_config=None):
         return jsonify({
             'categories': [
                 Category.format()['type'] for Category in categories],
+                'success':True
         })
 
     # '''
@@ -168,6 +169,9 @@ def create_app(test_config=None):
         try:
             query = Question.query.filter(Question.category == category_id)
             questions = [question.format() for question in query]
+
+            if not questions:
+                abort(404)
 
             return jsonify({
                 'success': True,
