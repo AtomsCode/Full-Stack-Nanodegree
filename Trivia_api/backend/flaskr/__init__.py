@@ -203,33 +203,25 @@ def create_app(test_config=None):
         if ((quiz_category is None) or (previous_questions is None)):
             abort(400)
 
-        # Check if category is not specified
-        # it should return all questions else specific category only
-        if (quiz_category == 0):
+        category_id = int(quiz_category['id'])
+        if category_id == 0:
             questions = Question.query.all()
         else:
-            questions = Question.query.filter_by(category=quiz_category).all()
+            questions = Question.query.filter_by(
+                    category=category_id).all()
 
-        # Function to generator random question
-        def get_random_question():
-            return questions[random.randint(0, len(questions)-1)]
+        def getRandomQuestions():
 
-        # get next question
-        next_question = get_random_question()
-
-        # check if next question not on previous questions
-        found = True
-        # loop if found is true until found new question
-        while found:
-            if next_question.id in previous_questions:
-                next_question = get_random_question()
+            randomQuestions = questions[random.randint(0, len(questions)-1)]
+            if randomQuestions.id in previous_questions:
+                return getRandomQuestions()
             else:
-                found = False
+                return randomQuestions
 
-        # retun the question
+        nextQuestion = getRandomQuestions()
         return jsonify({
             'success': True,
-            'question': next_question.format(),
+            'question': nextQuestion.format(),
         }), 200
 
     # ! TEST: In the "Play" tab, after a user selects "All" or a category,
