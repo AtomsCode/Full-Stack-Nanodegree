@@ -46,8 +46,8 @@ def create_app(test_config=None):
         return jsonify({
             'categories': [
                 Category.format()['type'] for Category in categories],
-                'success':True
-        })
+            'success': True
+            })
 
     # '''
     # * GET requests for questions,
