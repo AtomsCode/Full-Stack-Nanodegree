@@ -19,7 +19,9 @@ class TriviaTestCase(unittest.TestCase):
         self.hostname = '127.0.0.1'
         self.port_number = '5432'
         self.database_name = "trivia_test"
-        self.database_path = "postgres://{}:{}@{}:{}/{}".format(self.database_username , self.database_password , self.hostname , self.port_number , self.database_name)
+        self.database_path = "postgres://{}:{}@{}:{}/{}".format(
+            self.database_username, self.database_password, self.hostname,
+            self.port_number, self.database_name)
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -28,7 +30,7 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
@@ -46,23 +48,22 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_get_filtered_questions_by_category(self):
 
-        # Request data with category id 5 
+        # Request data with category id 5
         response = self.client().get('/categories/5/questions')
 
         # loading the data
         data = json.loads(response.data)
 
-        # check if status code and message 
+        # check status code and message
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
         # check that questions is not empty
         self.assertNotEqual(len(data['questions']), 0)
 
-    def test_category_id_not_valid(self):
+    def test_category_id_not_found(self):
 
-
-        # send request with category id 100
+        # send request with category id 9999
         response = self.client().get('/categories/9999/questions')
 
         # load response data
@@ -71,7 +72,6 @@ class TriviaTestCase(unittest.TestCase):
         # check response status code and message
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
-
 
     """ Test Cases Related to questions Routes """
     def test_get_questions(self):
@@ -82,7 +82,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertLessEqual(len(data['questions']), 10)
         self.assertIsInstance(data['total_questions'], int)
 
-        
     def test_delete_question(self):
         # question id 5 used for test
         question_id = 5
@@ -100,31 +99,32 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
 
     def test_search_questions(self):
-      
+
         # send post request with search term
-        response = self.client().post('/questions/search', json={'searchTerm': 'wh'})
-                                     
+        response = self.client().post(
+            '/questions/search', json={'searchTerm': 'wh'})
+
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
     def test_search_questions_not_found(self):
-      
+
         # send post request with search term
-        response = self.client().post('/questions/search', json={'searchTerm': ''})
-                                     
+        response = self.client().post(
+            '/questions/search', json={'searchTerm': ''})
+
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 422)
         self.assertEqual(data['success'], False)
 
-        
     """ Test Cases Related to quizzes Routes """
-    def test_get_quiz_questions(self):
+    def test_get_quiz_questions_found(self):
         data = {
-                "previous_questions": [1,2],
-                "quiz_category":1
+                "previous_questions": [1, 2],
+                "quiz_category": 1
                 }
 
         response = self.client().post('/quizzes', json=data)
@@ -133,7 +133,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["success"], True)
         self.assertTrue(data["question"])
-        
 
     def test_post_quiz_not_found(self):
         data = {
@@ -145,14 +144,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data["success"], False)
-
-
-    """ Test Cases Related to Error handler Routes """
-
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
 
 
 # Make the tests conveniently executable
