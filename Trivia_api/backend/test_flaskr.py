@@ -83,20 +83,19 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsInstance(data['total_questions'], int)
 
     def test_delete_question(self):
-        # question id 5 used for test
-        question_id = 5
+        question_id = 1
         response = self.client().delete(f'/questions/{question_id}')
         data = json.loads(response.data)
-        if response.status_code == 422:
+        if response.status_code == 404:
             self.assertEqual(data['success'], False)
         else:
-            self.assertEqual(data['DELETED ID'], True)
+            self.assertTrue(data['deleted'])
 
     def test_delete_question_fail(self):
-        question_id = 0
         response = self.client().delete('/questions/0')
         data = json.loads(response.data)
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+
 
     def test_search_questions(self):
 
@@ -122,17 +121,17 @@ class TriviaTestCase(unittest.TestCase):
 
     """ Test Cases Related to quizzes Routes """
     def test_get_quiz_questions_found(self):
-        data = {
-                "previous_questions": [1, 2],
-                "quiz_category": 1
-                }
-
-        response = self.client().post('/quizzes', json=data)
+        data_json = {
+            "previous_questions": [3, 4, 5, 10],
+            "quiz_category": {"type": "Art", "id": 2}
+                    }
+       
+        response = self.client().post('/quizzes', json=data_json)
         data = json.loads(response.data)
-
+        # confirm the status response code is 200 is mean Ok
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data["success"], True)
-        self.assertTrue(data["question"])
+        self.assertEqual(data['success'], True)
+        self.assertIsNotNone(data['question'])
 
     def test_post_quiz_not_found(self):
         data = {

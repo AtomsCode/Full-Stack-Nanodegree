@@ -41,12 +41,14 @@ def create_app(test_config=None):
 # '''
     @app.route('/categories', methods=['GET'])
     def all_categories():
-        categories = Category.query.all()
-
-        return jsonify({
-            'categories': [
-                Category.format()['type'] for Category in categories],
-            'success': True
+        
+            categories = {}
+            category_query = Category.query.all()
+            for category in category_query:
+                categories[category.id] = category.type.format()
+            return jsonify({
+                'success': True,
+                'categories': categories
             })
 
     # '''
@@ -93,18 +95,16 @@ def create_app(test_config=None):
     # '''
     @app.route('/questions/<int:id>', methods=['DELETE'])
     def delete_question(id):
-        try:
-            question = Question.query.get(id)
-            question.delete()
 
-            return jsonify({
-                'success': True,
-                'DELETED ID': id,
-            })
+        question = Question.query.get(id)
+        if not question:
+            return abort(404, f'{id} id not found ')
+        question.delete()
+        return jsonify({
+            'deleted': id
+        })
 
-        except:
-            abort(422)
-
+     
     # ! TEST: When you click the trash icon
     # next to a question, the question will be removed.
     # This removal will persist in the database and when you refresh the page.
