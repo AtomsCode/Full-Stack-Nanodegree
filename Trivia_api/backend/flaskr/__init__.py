@@ -41,7 +41,7 @@ def create_app(test_config=None):
 # '''
     @app.route('/categories', methods=['GET'])
     def all_categories():
-        
+
             categories = {}
             category_query = Category.query.all()
             for category in category_query:
@@ -104,7 +104,6 @@ def create_app(test_config=None):
             'deleted': id
         })
 
-     
     # ! TEST: When you click the trash icon
     # next to a question, the question will be removed.
     # This removal will persist in the database and when you refresh the page.
@@ -203,12 +202,19 @@ def create_app(test_config=None):
         if ((quiz_category is None) or (previous_questions is None)):
             abort(400)
 
+        # category and previous questions not empty
         category_id = int(quiz_category['id'])
         if category_id == 0:
             questions = Question.query.all()
         else:
             questions = Question.query.filter_by(
                     category=category_id).all()
+
+        if len(previous_questions) == len(questions):
+            return jsonify({
+                'ForceEnd': True,
+                'solvedQuestions': previous_questions
+                    }), 200
 
         def getRandomQuestions():
 
