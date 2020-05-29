@@ -5,5 +5,8 @@ app = Flask(__name__)
 
 @app.route('/headers')
 def headers():
-    print('hello world')
+
+    auth_header = request.headers['Authorization']
+
+    print(auth_header)
     return "not implimented"
